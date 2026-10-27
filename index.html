@@ -3,123 +3,71 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cómo funciona un depurador de Java</title>
-  <meta name="description" content="Animación interactiva para entender cómo funciona un depurador (debugger) de Java.">
+  <title>¿Qué Pokémon eres? · Test Mundo Misterioso</title>
+  <meta name="description" content="Responde 20 preguntas y descubre qué Pokémon de Pokémon Mundo Misterioso eres. ¡Con un 10 % de probabilidad de que sea shiny!">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero">
-    <h1>🐞 Cómo funciona un depurador de Java</h1>
-    <p>Un <strong>depurador</strong> (<em>debugger</em>) detiene tu programa mientras funciona
-      para que veas qué pasa por dentro. Aquí puedes probarlo con un programa pequeño.</p>
-  </header>
+  <div class="stars" aria-hidden="true"></div>
 
-  <main>
-    <section class="cards" aria-label="Ideas clave">
-      <article class="card">
-        <h2><span aria-hidden="true">1️⃣</span> ¿Para qué sirve?</h2>
-        <p>Para buscar errores (<em>bugs</em>). En vez de adivinar, paras el programa y miras
-          el valor de cada variable, línea a línea.</p>
-      </article>
-      <article class="card">
-        <h2><span aria-hidden="true">2️⃣</span> ¿Cómo lo hace?</h2>
-        <p>Tu programa corre dentro de la <strong>JVM</strong>. El <strong>IDE</strong>
-          (IntelliJ, Eclipse, VS Code…) se conecta a ella y le manda órdenes:
-          «para aquí», «da un paso», «dime cuánto vale <code>total</code>».</p>
-      </article>
-      <article class="card">
-        <h2><span aria-hidden="true">3️⃣</span> ¿Qué vas a ver?</h2>
-        <p>Un <strong>breakpoint</strong> (punto rojo donde parar), el <strong>paso a paso</strong>,
-          las <strong>variables</strong> y la <strong>pila de llamadas</strong>.</p>
-      </article>
+  <main class="wrap">
+    <!-- ============ INICIO ============ -->
+    <section id="intro" class="screen" aria-labelledby="intro-title">
+      <p class="kicker">Test de personalidad</p>
+      <h1 id="intro-title">¿Qué Pokémon eres en el <span>Mundo Misterioso</span>?</h1>
+      <p class="lead">Un día despiertas convertido en Pokémon. Responde <strong>20 preguntas</strong>
+        y descubre cuál eres.</p>
+      <p class="shiny-note">✨ Hay un <strong>10 %</strong> de probabilidad de que tu Pokémon sea <strong>shiny</strong>.</p>
+      <button type="button" id="start" class="btn big">¡Empezar!</button>
     </section>
 
-    <section id="lab" aria-labelledby="lab-title">
-      <h2 id="lab-title">Pruébalo tú</h2>
-      <p class="hint">① Pulsa <strong>Iniciar depuración</strong>. ② Mira cómo cambian las variables
-        con cada botón. ③ Haz clic en el círculo gris junto a un número para poner o quitar un
-        <strong>breakpoint</strong> 🔴.</p>
-
-      <div class="toolbar" role="group" aria-label="Controles del depurador">
-        <button type="button" id="b-start" class="primary" data-act="start">
-          ▶ Iniciar depuración<small>Debug</small></button>
-        <button type="button" id="b-cont" data-act="cont">
-          ⏩ Continuar<small>hasta el siguiente breakpoint</small></button>
-        <button type="button" id="b-over" data-act="over">
-          ⤵ Siguiente línea<small>Step Over</small></button>
-        <button type="button" id="b-into" data-act="into">
-          ↴ Entrar<small>Step Into</small></button>
-        <button type="button" id="b-out" data-act="out">
-          ↰ Salir<small>Step Out</small></button>
-        <button type="button" id="b-reset" data-act="reset">
-          ⟲ Reiniciar<small>parar y empezar de cero</small></button>
-        <button type="button" id="b-demo" class="demo">
-          🎬 Demo automática<small>se mueve sola</small></button>
+    <!-- ============ PREGUNTAS ============ -->
+    <section id="quiz" class="screen" aria-labelledby="q-text" hidden>
+      <div class="progress-row">
+        <span id="q-count" class="count">Pregunta 1 de 20</span>
+        <progress id="q-bar" max="20" value="1" aria-label="Progreso del test"></progress>
       </div>
-
-      <div class="status-row">
-        <span id="status" class="chip">Sin iniciar</span>
+      <div class="dialog">
+        <h2 id="q-text" tabindex="-1"></h2>
       </div>
-
-      <div class="grid">
-        <div class="panel code-panel">
-          <h3>Código <span class="file">Main.java</span></h3>
-          <ol id="code" class="code" aria-label="Código del programa"></ol>
-          <p class="legend"><span class="dot bp-dot"></span> breakpoint
-            <span class="arrow">▶</span> línea que va a ejecutarse</p>
-        </div>
-
-        <div class="side">
-          <div class="panel">
-            <h3>Variables <span class="sub" id="vars-owner"></span></h3>
-            <table class="vars">
-              <thead><tr><th>Nombre</th><th>Tipo</th><th>Valor</th></tr></thead>
-              <tbody id="vars"></tbody>
-            </table>
-          </div>
-          <div class="panel">
-            <h3>Pila de llamadas <span class="sub">(haz clic en un escalón)</span></h3>
-            <ol id="stack" class="stack"></ol>
-          </div>
-          <div class="panel">
-            <h3>Consola</h3>
-            <pre id="console" class="console" aria-live="polite"></pre>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel explain" id="explain" aria-live="polite"></div>
-
-      <div class="panel">
-        <h3>Lo que se dicen el IDE y la JVM</h3>
-        <p class="hint small">Cada botón envía un mensaje a la JVM y ella contesta con dónde se ha parado.
-          En Java este «idioma» se llama <strong>JDWP</strong> (<em>Java Debug Wire Protocol</em>).</p>
-        <div class="wire-row">
-          <div class="box" id="box-ide">🖥️<b>IDE</b><span>el depurador</span></div>
-          <div class="track" id="track"><div class="line"></div><div class="packet" id="packet"></div></div>
-          <div class="box" id="box-jvm">☕<b>JVM</b><span>tu programa</span></div>
-        </div>
-        <ol id="wire" class="wire" aria-label="Mensajes recientes"></ol>
+      <div id="q-options" class="options" role="group" aria-labelledby="q-text"></div>
+      <div class="nav">
+        <button type="button" id="back" class="btn ghost">← Anterior</button>
+        <span class="tip">Truco: también puedes pulsar las teclas 1, 2, 3 o 4.</span>
       </div>
     </section>
 
-    <section class="panel challenge" aria-labelledby="reto-title">
-      <h2 id="reto-title">🏆 Reto</h2>
-      <p>Quita el breakpoint de la línea 7 y pon uno <strong>solo en la línea 9</strong>.
-        Pulsa <em>Iniciar depuración</em> (primera parada) y luego <em>Continuar</em> dos veces.
-        ¿Cuánto vale <code>total</code> en la <strong>tercera parada</strong>?</p>
-      <details>
-        <summary>Ver la respuesta</summary>
-        <p><strong>6.</strong> En cada vuelta del <code>for</code>, <code>total</code> suma <code>doble(i)</code>.
-          Antes de la tercera vuelta ya ha sumado 2 + 4 = 6.</p>
-      </details>
+    <!-- ============ RESULTADO ============ -->
+    <section id="result" class="screen" aria-labelledby="r-name" hidden>
+      <p class="kicker">Tu Pokémon es…</p>
+      <div id="r-shiny" class="shiny-banner" hidden>✨ ¡¡SHINY!! ✨<small>Solo le pasa a 1 de cada 10 jugadores</small></div>
+      <div class="portrait-wrap">
+        <div id="r-frame" class="frame">
+          <img id="r-img" class="pix" width="200" height="200" alt="" hidden>
+          <p id="r-loading" class="loading">Cargando retrato…</p>
+        </div>
+        <div id="r-sparkles" class="sparkles" aria-hidden="true"></div>
+      </div>
+      <h2 id="r-name" tabindex="-1"></h2>
+      <div class="dialog small"><p id="r-text"></p></div>
+
+      <h3>Tus rasgos</h3>
+      <ul id="r-traits" class="traits"></ul>
+
+      <p id="r-second" class="second"></p>
+
+      <button type="button" id="again" class="btn big">Repetir el test</button>
     </section>
   </main>
 
   <footer>
-    <p>Hecho con HTML, CSS y JavaScript puros · Material para clase</p>
+    <p>Retratos: <a href="https://github.com/PMDCollab/SpriteCollab" target="_blank" rel="noopener">PMD Sprite Repository (SpriteCollab)</a>,
+      con créditos a sus artistas.</p>
+    <p>Pokémon y Pokémon Mundo Misterioso son marcas de Nintendo, Creatures Inc., GAME FREAK inc. y Spike Chunsoft.
+      Proyecto de fans, sin ánimo de lucro.</p>
   </footer>
 
+  <script src="data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
