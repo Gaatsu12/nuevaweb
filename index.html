@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cómo funciona un depurador de Java</title>
+  <meta name="description" content="Animación interactiva para entender cómo funciona un depurador (debugger) de Java.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <h1>🐞 Cómo funciona un depurador de Java</h1>
+    <p>Un <strong>depurador</strong> (<em>debugger</em>) detiene tu programa mientras funciona
+      para que veas qué pasa por dentro. Aquí puedes probarlo con un programa pequeño.</p>
+  </header>
+
+  <main>
+    <section class="cards" aria-label="Ideas clave">
+      <article class="card">
+        <h2><span aria-hidden="true">1️⃣</span> ¿Para qué sirve?</h2>
+        <p>Para buscar errores (<em>bugs</em>). En vez de adivinar, paras el programa y miras
+          el valor de cada variable, línea a línea.</p>
+      </article>
+      <article class="card">
+        <h2><span aria-hidden="true">2️⃣</span> ¿Cómo lo hace?</h2>
+        <p>Tu programa corre dentro de la <strong>JVM</strong>. El <strong>IDE</strong>
+          (IntelliJ, Eclipse, VS Code…) se conecta a ella y le manda órdenes:
+          «para aquí», «da un paso», «dime cuánto vale <code>total</code>».</p>
+      </article>
+      <article class="card">
+        <h2><span aria-hidden="true">3️⃣</span> ¿Qué vas a ver?</h2>
+        <p>Un <strong>breakpoint</strong> (punto rojo donde parar), el <strong>paso a paso</strong>,
+          las <strong>variables</strong> y la <strong>pila de llamadas</strong>.</p>
+      </article>
+    </section>
+
+    <section id="lab" aria-labelledby="lab-title">
+      <h2 id="lab-title">Pruébalo tú</h2>
+      <p class="hint">① Pulsa <strong>Iniciar depuración</strong>. ② Mira cómo cambian las variables
+        con cada botón. ③ Haz clic en el círculo gris junto a un número para poner o quitar un
+        <strong>breakpoint</strong> 🔴.</p>
+
+      <div class="toolbar" role="group" aria-label="Controles del depurador">
+        <button type="button" id="b-start" class="primary" data-act="start">
+          ▶ Iniciar depuración<small>Debug</small></button>
+        <button type="button" id="b-cont" data-act="cont">
+          ⏩ Continuar<small>hasta el siguiente breakpoint</small></button>
+        <button type="button" id="b-over" data-act="over">
+          ⤵ Siguiente línea<small>Step Over</small></button>
+        <button type="button" id="b-into" data-act="into">
+          ↴ Entrar<small>Step Into</small></button>
+        <button type="button" id="b-out" data-act="out">
+          ↰ Salir<small>Step Out</small></button>
+        <button type="button" id="b-reset" data-act="reset">
+          ⟲ Reiniciar<small>parar y empezar de cero</small></button>
+        <button type="button" id="b-demo" class="demo">
+          🎬 Demo automática<small>se mueve sola</small></button>
+      </div>
+
+      <div class="status-row">
+        <span id="status" class="chip">Sin iniciar</span>
+      </div>
+
+      <div class="grid">
+        <div class="panel code-panel">
+          <h3>Código <span class="file">Main.java</span></h3>
+          <ol id="code" class="code" aria-label="Código del programa"></ol>
+          <p class="legend"><span class="dot bp-dot"></span> breakpoint
+            <span class="arrow">▶</span> línea que va a ejecutarse</p>
+        </div>
+
+        <div class="side">
+          <div class="panel">
+            <h3>Variables <span class="sub" id="vars-owner"></span></h3>
+            <table class="vars">
+              <thead><tr><th>Nombre</th><th>Tipo</th><th>Valor</th></tr></thead>
+              <tbody id="vars"></tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Pila de llamadas <span class="sub">(haz clic en un escalón)</span></h3>
+            <ol id="stack" class="stack"></ol>
+          </div>
+          <div class="panel">
+            <h3>Consola</h3>
+            <pre id="console" class="console" aria-live="polite"></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel explain" id="explain" aria-live="polite"></div>
+
+      <div class="panel">
+        <h3>Lo que se dicen el IDE y la JVM</h3>
+        <p class="hint small">Cada botón envía un mensaje a la JVM y ella contesta con dónde se ha parado.
+          En Java este «idioma» se llama <strong>JDWP</strong> (<em>Java Debug Wire Protocol</em>).</p>
+        <div class="wire-row">
+          <div class="box" id="box-ide">🖥️<b>IDE</b><span>el depurador</span></div>
+          <div class="track" id="track"><div class="line"></div><div class="packet" id="packet"></div></div>
+          <div class="box" id="box-jvm">☕<b>JVM</b><span>tu programa</span></div>
+        </div>
+        <ol id="wire" class="wire" aria-label="Mensajes recientes"></ol>
+      </div>
+    </section>
+
+    <section class="panel challenge" aria-labelledby="reto-title">
+      <h2 id="reto-title">🏆 Reto</h2>
+      <p>Quita el breakpoint de la línea 7 y pon uno <strong>solo en la línea 9</strong>.
+        Pulsa <em>Iniciar depuración</em> (primera parada) y luego <em>Continuar</em> dos veces.
+        ¿Cuánto vale <code>total</code> en la <strong>tercera parada</strong>?</p>
+      <details>
+        <summary>Ver la respuesta</summary>
+        <p><strong>6.</strong> En cada vuelta del <code>for</code>, <code>total</code> suma <code>doble(i)</code>.
+          Antes de la tercera vuelta ya ha sumado 2 + 4 = 6.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Hecho con HTML, CSS y JavaScript puros · Material para clase</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
